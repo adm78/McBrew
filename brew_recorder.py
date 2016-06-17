@@ -8,6 +8,7 @@ running with a ficticous stream of temperature data '''
 import random
 from datetime import datetime
 from os.path import expanduser, join
+import time
 
 def getTemperature():
 
@@ -28,10 +29,12 @@ def recordDataToDB():
         
     #get/recorder the temperature
     count = 0
-    while count < 10:
+    while count < 100:
         current_time, current_temp = getTemperature()
         rec_file.write(current_time + '\t' + str(current_temp) + '\n')
+        rec_file.flush()
         count = count + 1
+        time.sleep(5)
     rec_file.close()
 
 def recordMetaDataToDB():
