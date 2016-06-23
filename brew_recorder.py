@@ -20,7 +20,7 @@ def getTemperature():
 
     '''return the time. temperature of the fermenter in degC'''
 
-    return (datetime.now()).ctime(), random.uniform(18.0, 23.0)
+    return datetime.now(), random.uniform(18.0, 23.0)
 
 def recordDataToDB(max_points=100,dt_update=dt_update):
 
@@ -44,9 +44,15 @@ def recordDataToDB(max_points=100,dt_update=dt_update):
     rec_filenames = [join(db_path,'temperature_evolution_start.txt'),join(db_path,'temperature_evolution_end.txt')]
 
     #delete the old cache files
-    os.remove(rec_filenames[0])
-    os.remove(rec_filenames[1])
-
+    try:
+        os.remove(rec_filenames[0])
+    except OSError:
+        pass
+    try:
+        os.remove(rec_filenames[1])
+    except OSError:
+        pass
+    
     #initialise the various counters
     first_cache_fill = True
     
@@ -74,7 +80,7 @@ def fillCache(cache_index, max_points,rec_filenames,dt_update):
     while (rec_count <= max_points):
                 
         current_time, current_temp = getTemperature()
-        rec_file.write(current_time + '\t' + str(current_temp) + '\n')
+        rec_file.write(current_time.isoformat() + '\t' + str(current_temp) + '\n')
         rec_file.flush()
         rec_count = rec_count + 1
         time.sleep(dt_update)
