@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mcbrewMainWindow</class>
+ <widget class="QMainWindow" name="mcbrewMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1096</width>
+    <height>753</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>mcbrew</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="GUIresources/mcbrewGUIresources.qrc">
+    <normaloff>:/icons/ferm_square.png</normaloff>:/icons/ferm_square.png</iconset>
+  </property>
+  <widget class="QWidget" name="mcbrewcentralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="mcbrewhorizontalLayout"/>
+    </item>
+    <item>
+     <widget class="vcePlotWidget" name="vceplotArea" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="mcbrewmenubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1096</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="mcbrewmenuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="mcbrewactionOpen"/>
+    <addaction name="separator"/>
+    <addaction name="mcbrewactionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionSettings"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
+   <addaction name="mcbrewmenuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+  </widget>
+  <widget class="QToolBar" name="mcbrewtoolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>50</width>
+     <height>50</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="mcbrewActionViewTherm"/>
+  </widget>
+  <action name="mcbrewactionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/icons/settings.png</normaloff>:/icons/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionFlash_tank">
+   <property name="text">
+    <string>Flash tank</string>
+   </property>
+  </action>
+  <action name="mcbrewActionViewTherm">
+   <property name="icon">
+    <iconset resource="GUIresources/mcbrewGUIresources.qrc">
+     <normaloff>:/icons/ferm_plus_therm.png</normaloff>:/icons/ferm_plus_therm.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flash Tank</string>
+   </property>
+  </action>
+  <action name="mcbrewactionQuit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="vceactionSineWave">
+   <property name="text">
+    <string>Sine Wave</string>
+   </property>
+  </action>
+  <action name="vceactionCosineWave">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/icons/sine_wave.png</normaloff>:/icons/sine_wave.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cosine Wave</string>
+   </property>
+  </action>
+  <action name="actionCosine_Wave">
+   <property name="text">
+    <string>Cosine Wave</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>vcePlotWidget</class>
+   <extends>QWidget</extends>
+   <header>vceplotwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="GUIresources/mcbrewGUIresources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
