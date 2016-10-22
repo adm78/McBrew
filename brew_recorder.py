@@ -14,7 +14,9 @@ import argparse
 parser = argparse.ArgumentParser(                                                                                        
     description=("Updates a cache (Dropbox) with the latest" +
                  " thermal data from the brew machine." +
-                  " For now we are running with ficticous thermal data."),                                                            
+                 " For now we are running with ficticous thermal data." +
+                 " Uses dropbox_uploader to upadte the remote cache for " +
+                 " Raspian compatiblity."),                                                            
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)                                                              
 
 parser.add_argument('-m','--max',
@@ -27,39 +29,42 @@ parser.add_argument('-e','--end',
                     type=float,default=-1,                                                                                     
                     help=("the time (hrs) to elapse before this script" + 
                           "auto-terminates, -1=infinite"))
+parser.add_argument('-d','--debug', 
+                    default=False, action="store_true",                                                                                     
+                    help=("the verbose option."))
+
 
 args = parser.parse_args() 
 max_points =  args.max
 dt_update = args.dt
 dt_terminate = args.end
+debug_log = args.debug
 
 
 #==================================================================                                                      
 # various function definitions                                                                                                      
 #==================================================================  
-def getTemperature():
+def get_temperature():
 
     '''return the time. temperature of the fermenter in degC'''
     return datetime.now(), random.uniform(18.0, 23.0)
 
 
-def recordDataToDB(max_points=100,dt_update=dt_update):
+def init_recorder(max_points=100,dt_update=dt_update):
 
     ''' this is the main data collection loop '''
 
-    #get the Dropbox directory path and open the file
-    home = expanduser("~")
-    db_path = join(home,'Dropbox','homebrew','brew_recorder')
-    rec_filenames = [join(db_path,'T_cache_1.txt'),join(db_path,'T_cache_2.txt')]
+    #define the cache files
+    local_cache = ['T_cache_1.txt', 'T_cache_2.txt']
 
     #delete the old cache files
     for i in range(2):
         try:
-            os.remove(rec_filenames[i])
+            os.remove(local_cache[i])
         except OSError:
             pass
-
-    
+        delete_remote_cache(local_cache[i])
+ 
     #initialise the various counters
     first_cache_fill = True
     
@@ -69,31 +74,52 @@ def recordDataToDB(max_points=100,dt_update=dt_update):
 
             # loop over the cache files until both are full
             for i in range(2):
-                fillCache(i,max_points,rec_filenames,dt_update)
+                fill_cache(i,max_points,local_cache,dt_update)
             first_cache_fill = False
             
         else:
             #both files have previously been filled, copy end cache over start cache
-            copyfile(rec_filenames[1], rec_filenames[0])
-            fillCache(1,max_points,rec_filenames,dt_update)
+            copyfile(local_cache[1], local_cache[0])
+            update_remote_cache(local_cache[0])
+            fill_cache(1,max_points,local_cache,dt_update)
 
 
-
-def fillCache(cache_index, max_points,rec_filenames,dt_update):
+def fill_cache(cache_index, max_points,local_cache,dt_update):
 
     #writes to a cache file until it's full
     rec_count = 1  #number of temps recorder in the current file
-    rec_file = open(rec_filenames[cache_index],'w')
-    rec_file.write("#date" + 2*'\t' + "time" + 2*'\t' + "temperature/degC" + "\n")
+    active_cache = open(local_cache[cache_index],'w')
+    active_cache.write("#date" + 2*'\t' + "time" 
+                       + 2*'\t' + "temperature/degC" + "\n")
             
     while (rec_count <= max_points):
                 
-        current_time, current_temp = getTemperature()
-        rec_file.write(current_time.strftime("%d/%m/%Y\t%H:%M:%S") + '\t' + str(current_temp) + '\n')
-        rec_file.flush()
+        current_time, current_temp = get_temperature()
+        active_cache.write(current_time.strftime("%d/%m/%Y\t%H:%M:%S") + 
+                           '\t' + str(current_temp) + '\n')
+        active_cache.flush() #forces the local cache to update
+        update_remote_cache(local_cache[cache_index])
         rec_count = rec_count + 1
         time.sleep(dt_update)
-    rec_file.close()
+    active_cache.close()
+
+def update_remote_cache(cache_filename):
     
+    if debug_log:
+        options = ""
+    else: 
+        options = "-q "
+    update_cmd = ("dropbox_uploader.sh " + options + "upload " + cache_filename +
+           " " + cache_filename)
+    os.system(update_cmd)
+
+def delete_remote_cache(cache_filename):
      
-recordDataToDB(max_points=max_points,dt_update=dt_update)
+    if debug_log:
+        options = ""
+    else: 
+        options = "-q "
+    delete_cmd = ("dropbox_uploader.sh " + options + "delete " + cache_filename)
+    os.system(delete_cmd)
+     
+init_recorder(max_points,dt_update)
