@@ -55,7 +55,7 @@ def init_recorder(max_points=100,dt_update=dt_update):
     ''' this is the main data collection loop '''
 
     #define the cache files
-    local_cache = ['T_cache_1.txt', 'T_cache_2.txt']
+    local_cache = ['T_cache_1.csv', 'T_cache_2.csv']
 
     #delete the old cache files
     for i in range(2):
@@ -89,14 +89,14 @@ def fill_cache(cache_index, max_points,local_cache,dt_update):
     #writes to a cache file until it's full
     rec_count = 1  #number of temps recorder in the current file
     active_cache = open(local_cache[cache_index],'w')
-    active_cache.write("#date" + 2*'\t' + "time" 
-                       + 2*'\t' + "temperature/degC" + "\n")
+    # active_cache.write("#date" + 2*'\t' + "time" 
+    #                    + 2*'\t' + "temperature/degC" + "\n")
             
     while (rec_count <= max_points):
                 
         current_time, current_temp = get_temperature()
-        active_cache.write(current_time.strftime("%d/%m/%Y\t%H:%M:%S") + 
-                           '\t' + str(current_temp) + '\n')
+        active_cache.write(current_time.strftime("%d/%m/%Y %H:%M:%S") + 
+                           ';' + str(current_temp) + '\n')
         active_cache.flush() #forces the local cache to update
         update_remote_cache(local_cache[cache_index])
         rec_count = rec_count + 1
