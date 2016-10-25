@@ -26,7 +26,7 @@ stream_id = stream_ids[0]
 # # Make instance of stream id object 
 stream_1 = go.Stream(
     token=stream_id,  # link stream id to 'token' key
-    maxpoints=80      # keep a max of 80 pts on screen
+    maxpoints=36      # keep a max of 80 pts on screen
 )
 
 # Initialize trace of streaming plot by embedding the unique stream_id
@@ -77,7 +77,7 @@ while True:
     #     Write numbers to stream to append current data on plot,
     #     write lists to overwrite existing data on plot
             
-    time.sleep(20)  # plot a point every second    
+    time.sleep(300)  # plot a point every second    
 # Close the stream when done plotting
 s.close()
 
