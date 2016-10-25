@@ -9,6 +9,7 @@ just take the last value and delet the array'''
 from os.path import expanduser, join, isfile
 #from shutil import copyfile
 import pandas as pd
+import datetime
 
 def init_reader():
 
@@ -35,13 +36,16 @@ def init_reader():
     elif (not isfile(cache_filenames[1])):
 
         print "Warning: the secondary cache file is not present"
-        print "herp-a-derp I'm notdoing anything for the moment..."
+        print "testing reader for the moment..."
+        c1 = pd.read_csv(cache_filenames[0],delimiter=';', parse_dates=True,date_parser=dateparse, index_col='DateTime', names=['DateTime', 'T'], header=None)
+        print c1
         
 #        copyfile(cache_filenames[0],cache_filenames[0])
         
     # both cache files are present
     else:
         print "Both cache files have been found!"
+
         # print "Generating temporary caches."
         # copyfile(cache_filenames[0],cache_filenames[0])
         # copyfile(cache_filenames[1],cache_filenames[1])  
@@ -74,7 +78,11 @@ def init_reader():
     # while count < 1000:
     #     with open(read_filename,'r') as f:
     #         pass
-    #     count += 1 
+    #     count += 1
+
+def dateparse (date_string):    
+    return datetime.datetime.strptime(date_string, "%d/%m/%Y %H:%M:%S")
+
 
 if __name__ == "__main__":
     init_reader()
