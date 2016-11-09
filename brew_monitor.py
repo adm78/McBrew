@@ -11,11 +11,35 @@ import plotly.graph_objs as go
 import datetime 
 import time
 import random
+import Adafruit_MCP9808.MCP9808 as MCP9808
+import argparse
 
-def get_temperature():
+#==================================================================                                                      
+# command line args                                                                                                      
+#==================================================================                                                      
+parser = argparse.ArgumentParser(                                                                                        
+    description=("reads data from MCP9808 temperature sensor" +
+                 "via i2c and streams live to plotly server" +
+                 "at https://plot.ly/~adm78/0/primary-fermenter-test/"),                                                            
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)                                                              
+parser.add_argument('-t','--time_delay',
+                    type=float,default=5.0,                                                                                     
+                    help="time delay between updates in [mins]")
 
-    '''return the time. temperature of the fermenter in degC'''
-    return random.uniform(18.0, 23.0)
+args = parser.parse_args() 
+time_delay =  args.time_delay*60.0
+print "Updating every", args.time_delay,"[mins]"
+
+#==================================================================    
+# intialise the sensor
+#==================================================================    
+
+sensor = MCP9808.MCP9808()
+sensor.begin()
+
+#==================================================================    
+#initialise the plotly stream
+#==================================================================    
 
 stream_ids = tls.get_credentials_file()['stream_ids']
 print stream_ids
@@ -56,6 +80,10 @@ py.plot(fig, filename='python-streaming')
 # We will provide the stream link object the same token that's associated with the trace we wish to stream to
 s = py.Stream(stream_id)
 
+#==================================================================    
+# begin streaming
+#==================================================================
+    
 # We then open a connection
 s.open()
 
@@ -69,7 +97,7 @@ while True:
     
     # Current time on x-axis, random numbers on y-axis
     x = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-    y = get_temperature()
+    y = sensor.readTempC()
 
     # Send data to your plot
     s.write(dict(x=x, y=y))
@@ -77,7 +105,7 @@ while True:
     #     Write numbers to stream to append current data on plot,
     #     write lists to overwrite existing data on plot
             
-    time.sleep(300)  # plot a point every second    
+    time.sleep(time_delay)  # plot a point every second    
 # Close the stream when done plotting
 s.close()
 
