@@ -1,5 +1,5 @@
+![alt tag](https://github.com/adm78/McBrew/blob/master/UI/GUIresources/mcbrew_logo_med.png)
 # McBrew
-![alt tag](https://github.com/adm78/McBrew/blob/master/UI/GUIresources/ferml_plus_therm_med.png)
 
 A series of Python scripts for recording and remotely monitoring fermenter temperature evolutions. 
 
