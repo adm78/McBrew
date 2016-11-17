@@ -1,5 +1,6 @@
 # McBrew
-![alt tag](https://github.com/adm78/McBrew/blob/master/UI/GUIresources/ferm_plus_therm.png)
+![alt tag](https://github.com/adm78/McBrew/blob/master/UI/GUIresources/ferm_plus_therm_med.png)
+
 A series of Python scripts for recording and remotely monitoring fermenter temperature evolutions. 
 
 The most functional script for now is brew_monitor.py. This script is able to live stream data from an MCP9808 thermal sensor to plot.ly. 
