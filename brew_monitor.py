@@ -11,6 +11,7 @@ import datetime
 import time
 import Adafruit_MCP9808.MCP9808 as MCP9808
 import argparse
+from socket import error as SocketError
 
 #==================================================================                                                      
 # command line args                                                                                                      
@@ -47,8 +48,13 @@ def send_data(s,sensor):
     y = sensor.readTempC()
 
     # Send data to your plot
-    s.write(dict(x=x, y=y))
- 
+    try:
+        s.write(dict(x=x, y=y))
+    except SocketError:
+        print x, ":",
+        print "No connection to perfrom write.",
+        print "Retrying in", time_delay,"[s]."
+
 #==================================================================    
 # intialise the sensor
 #==================================================================    
@@ -95,7 +101,6 @@ fig = go.Figure(data=data, layout=layout)
 py.plot(fig, filename='Oktoberfest_stream',auto_open=False)
 
 
-
 #start of continuous streaming section
 # We will provide the stream link object the same token that's 
 # associated with the trace we wish to stream to
@@ -122,8 +127,14 @@ while True:
            print "https://plot.ly/~adm78/3/lagering-chamber/"
            first_pass_log = False
 
-   #send a heartbeat    
-   s.heartbeat()
+   #send a heartbeat, handling socket error    
+   try:
+       s.heartbeat()
+   except SocketError:
+       print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), ":",
+       print "No connection to perfrom heartbeat.",
+       print "Retrying in 30[s]."
+
    time.sleep(30)
    count += 30
  
