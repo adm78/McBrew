@@ -16,6 +16,7 @@ import time
 import Adafruit_MCP9808.MCP9808 as MCP9808
 import argparse
 from socket import error as SocketError
+import os
 
 #==================================================================                                                      
 # command line args                                                                                                      
@@ -113,37 +114,33 @@ s = py.Stream(stream_id)
 #================================================================= 
 # begin streaming
 #=================================================================   
-# We then open a connection
-s.open()
-
-count = time_delay
+dt = time_delay
 first_pass_log = True
 
-# stream the data, heartbeating every 30[s]
+# streaming loop
 while True:
     
-   #check if data point needs to be streamed
-   if count >= time_delay:
-       send_data(s,sensor)
-       count = 0
-       if first_pass_log:
-           print "Streaming initiated at",
-           print "https://plot.ly/~adm78/3/lagering-chamber/"
-           first_pass_log = False
+   #try and stream the data
+   if dt >= time_delay:
+       try:
+           s.open()
+           send_data(s,sensor)
+           dt = 0
 
-   # #send a heartbeat, handling socket error    
-   try:
-       s.heartbeat()
-   except SocketError:
-       print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), ":",
-       print "No connection to perform heartbeat.",
-       print "Retrying in 30[s]."
+           if first_pass_log:
+               print "Streaming initiated at",
+               print "https://plot.ly/~adm78/3/lagering-chamber/"
+               first_pass_log = False
+
+       except SocketError:
+           print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), ":",
+           print "No connection to perform heartbeat."
+           print "Attempting to reconnect to wireless..."
+           os.system('./wireless_connect.sh')
    
-   time.sleep(30)
-   count += 30
+   time.sleep(time_delay)
+   dt += time_delay
  
-# Close the stream when done plotting
-s.close()
 
 
 
