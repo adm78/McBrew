@@ -2,7 +2,11 @@
 
 '''This script uploads thermal data from the brew machine to the
 plotly server.
-Note: currently generating random thermal data'''
+
+Existing issues: If we get kicked out of UniofCam Network then a 
+manual sign-in is required...bleugh
+
+'''
 
 import plotly.plotly as py 
 import plotly.tools as tls   
@@ -127,19 +131,22 @@ while True:
            print "https://plot.ly/~adm78/3/lagering-chamber/"
            first_pass_log = False
 
-   #send a heartbeat, handling socket error    
+   # #send a heartbeat, handling socket error    
    try:
        s.heartbeat()
    except SocketError:
        print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), ":",
-       print "No connection to perfrom heartbeat.",
+       print "No connection to perform heartbeat.",
        print "Retrying in 30[s]."
-
+   
    time.sleep(30)
    count += 30
  
 # Close the stream when done plotting
 s.close()
+
+
+
 
 
 
