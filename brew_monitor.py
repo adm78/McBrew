@@ -3,9 +3,6 @@
 '''This script uploads thermal data from the brew machine to the
 plotly server.
 
-Existing issues: If we get kicked out of UniofCam Network then a 
-manual sign-in is required...bleugh
-
 '''
 
 import plotly.plotly as py 
@@ -27,10 +24,10 @@ parser = argparse.ArgumentParser(
                  "at https://plot.ly/~adm78/0/primary-fermenter-test/"),                                                            
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)                                                              
 parser.add_argument('-t','--time_delay',
-                    type=float,default=5.0,                                                                                     
+                    type=float,default=30.0,                                                                                     
                     help="time delay between updates in [mins]")
 parser.add_argument('-p','--points',
-                    type=int,default=50,                                                                       
+                    type=int,default=200,                                                                       
                     help="number of points held on the graph")
 args = parser.parse_args() 
 time_delay =  args.time_delay*60.0
@@ -39,7 +36,7 @@ max_points = args.points
 # check that the delay is okay
 if time_delay <= 72.0:
     print "Warning: the plotly free Python API limits the user to",
-    print "a maximum of 50 API calls per day (one very 72[s]) or 30",
+    print "a maximum of 50 API calls per day (one very ~28[mins]) or 30",
     print "in any hour. The delay between calls can be set using with the,"
     print "-t arg. Current time delay =", time_delay,"[s]."
 else:
@@ -134,7 +131,7 @@ while True:
 
        except SocketError:
            print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), ":",
-           print "No connection to perform heartbeat."
+           print "No connection to perform data stream."
            print "Attempting to reconnect to wireless..."
            os.system('./wireless_connect.sh')
    
