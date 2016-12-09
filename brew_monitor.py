@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
-'''This script uploads thermal data from the brew machine to the
-plotly server.
+'''
+This script uploads thermal data from the brew machine to the plotly
+server. Requires a wireless connection script wireless.sh to be placed
+in the run directory to ensure the connection is mantained.
 
 '''
 
@@ -34,7 +36,7 @@ time_delay =  args.time_delay*60.0
 max_points = args.points
 
 # check that the delay is okay
-if time_delay <= 72.0:
+if time_delay <= 1680.0:
     print "Warning: the plotly free Python API limits the user to",
     print "a maximum of 50 API calls per day (one very ~28[mins]) or 30",
     print "in any hour. The delay between calls can be set using with the,"
@@ -66,13 +68,11 @@ sensor.begin()
 print "Sensor connection initialised."
 
 #================================================================    
-#initialise the plotly stream
+# initialise the plotly stream
 #================================================================    
 
-stream_ids = tls.get_credentials_file()['stream_ids']
-#print stream_ids
-
 # Get stream id from stream id list 
+stream_ids = tls.get_credentials_file()['stream_ids']
 stream_id = stream_ids[0]
 
 # Make instance of stream id object 
