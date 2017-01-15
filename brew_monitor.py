@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(
                  "at https://plot.ly/~adm78/0/primary-fermenter-test/"),                                                            
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)                                                              
 parser.add_argument('-t','--time_delay',
-                    type=float,default=30.0,                                                                                     
+                    type=float,default=10.0,                                                                                     
                     help="time delay between updates in [mins]")
 parser.add_argument('-p','--points',
                     type=int,default=200,                                                                       
@@ -39,7 +39,7 @@ max_points = args.points
 if time_delay <= 1680.0:
     print "Warning: the plotly free Python API limits the user to",
     print "a maximum of 50 API calls per day (one very ~28[mins]) or 30",
-    print "in any hour. The delay between calls can be set using with the,"
+    print "in any hour. The delay between calls can be set using the,"
     print "-t arg. Current time delay =", time_delay,"[s]."
 else:
     print "Updating every", args.time_delay,"[mins]."
