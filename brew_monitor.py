@@ -6,6 +6,10 @@ server. Requires a wireless connection script wireless.sh to be placed
 in the run directory to ensure the connection is mantained.
 
 '''
+#debug
+logfile = open('/home/pi/bm.log','a')
+logfile.write("brew_monitor.py: hello world. Starting module imports...\n")
+logfile.flush()
 
 import plotly.plotly as py 
 import plotly.tools as tls   
@@ -17,9 +21,14 @@ import argparse
 from socket import error as SocketError
 import os
 
-#==================================================================                                                      
+
+#debug
+logfile.write("brew_monitor.py: I've just imported all the modules.\n")
+logfile.flush()
+# ==================================================================                                                      
 # command line args                                                                                                      
-#==================================================================                                                      
+# ==================================================================             
+
 parser = argparse.ArgumentParser(                                                                                        
     description=("reads data from MCP9808 temperature sensor" +
                  "via i2c and streams live to plotly server" +
@@ -35,15 +44,22 @@ args = parser.parse_args()
 time_delay =  args.time_delay*60.0
 max_points = args.points
 
+logfile.write("brewing_monitor.py: I've just parse the args. About to check time delay\n")
+
 # check that the delay is okay
 if time_delay <= 1680.0:
-    print "Warning: the plotly free Python API limits the user to",
-    print "a maximum of 50 API calls per day (one very ~28[mins]) or 30",
-    print "in any hour. The delay between calls can be set using the,"
-    print "-t arg. Current time delay =", time_delay,"[s]."
+    logfile.write("------------------------------------------------------------\n")
+    logfile.write("Warning: the plotly free Python API limits the user to")
+    logfile.write("a maximum of 50 API calls per day (one very ~28[mins]) or 30")
+    logfile.write("in any hour. The delay between calls can be set using the")
+    logfile.write("-t arg. Current time delay = "+ str(time_delay) + "[s].\n")
+    logfile.write("------------------------------------------------------------\n")
 else:
-    print "Updating every", args.time_delay,"[mins]."
+    logfile.write("Updating every" +  str(args.time_delay) + "[mins].\n")
+logfile.flush()    
 
+logfile.write("brewing_monitor.py: I've just check the time delay. About to start the sensor connection")
+logfile.flush()
 #================================================================== 
 def send_data(s,sensor):
 
@@ -55,18 +71,19 @@ def send_data(s,sensor):
     try:
         s.write(dict(x=x, y=y))
     except SocketError:
-        print x, ":",
-        print "No connection to perfrom write.",
-        print "Retrying in", time_delay,"[s]."
-
+        logfile.write(str(x) + " :\n")
+        logfile.write("No connection to perfrom write.",)
+        logfile.write("Retrying in " + str(time_delay) + "[s].\n")
+        logfile.flush()
 #==================================================================    
 # intialise the sensor
 #==================================================================    
 
 sensor = MCP9808.MCP9808()
 sensor.begin()
-print "Sensor connection initialised."
-
+logfile.write("Sensor connection initialised.\n")
+logfile.write("brew_monitor.py: About to rey and get the stream ids\n")
+logfile.flush()
 #================================================================    
 # initialise the plotly stream
 #================================================================    
@@ -75,11 +92,17 @@ print "Sensor connection initialised."
 stream_ids = tls.get_credentials_file()['stream_ids']
 stream_id = stream_ids[0]
 
+logfile.write("brew_monitor.py: got the stream ids. About to start go.Stream...\n")
+logfile.flush()
+
 # Make instance of stream id object 
 stream_1 = go.Stream(
     token=stream_id,  # link stream id to 'token' key
     maxpoints=max_points # keep a max of max_points pts on screen
 )
+
+logfile.write("brew_monitor.py: stream_1 object created. About to try an initialise the trace...\n")
+logfile.flush()
 
 # Initialize trace of streaming plot by embedding the unique stream_id
 trace1 = go.Scatter(
@@ -96,12 +119,18 @@ layout = go.Layout(title='Lagering Chamber',
                    xaxis=dict(title="Time"),
                    yaxis=dict(title="Temperature/degC"))
 
+logfile.write("brew_monitor.py: go.Data completed. about to make the fig and run py.plot...\n")
+logfile.flush()
+
 # Make a figure object
 fig = go.Figure(data=data, layout=layout)
 
 # Send fig to Plotly, initialize streaming plot, open new tab
 py.plot(fig, filename='Oktoberfest_stream',auto_open=False)
 
+
+logfile.write("brew_monitor.py: run py.plot successfully. About to try py.Stream before we start the loop...\n")
+logfile.flush()
 
 #start of continuous streaming section
 # We will provide the stream link object the same token that's 
@@ -114,6 +143,9 @@ s = py.Stream(stream_id)
 dt = time_delay
 first_pass_log = True
 
+logfile.write("brew_monitor.py: py.Stream was successful. About to start the streaming loop... loop for first loop pass message.\n")
+logfile.flush()
+
 # streaming loop
 while True:
     
@@ -123,16 +155,18 @@ while True:
            s.open()
            send_data(s,sensor)
            dt = 0
-
+           
            if first_pass_log:
-               print "Streaming initiated at",
-               print "https://plot.ly/~adm78/3/lagering-chamber/"
+               logfile.write("Streaming initiated at")
+               logfile.write("https://plot.ly/~adm78/3/lagering-chamber/")
+               logfile.flush()
                first_pass_log = False
-
+               
        except SocketError:
-           print datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), ":",
-           print "No connection to perform data stream."
-           print "Attempting to reconnect to wireless..."
+           logfile.write(str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))+ ":")
+           logfile.write("No connection to perform data stream.")
+           logfile.write("Attempting to reconnect to wireless...\n")
+           logfile.flush()
            os.system('./wireless_connect.sh')
    
    time.sleep(time_delay)
