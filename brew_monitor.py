@@ -20,7 +20,7 @@ import Adafruit_MCP9808.MCP9808 as MCP9808
 import argparse
 from socket import error as SocketError
 import os
-
+import subprocess
 
 #debug
 logfile.write("brew_monitor.py: I've just imported all the modules.\n")
@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(
                  "at https://plot.ly/~adm78/0/primary-fermenter-test/"),                                                            
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)                                                              
 parser.add_argument('-t','--time_delay',
-                    type=float,default=10.0,                                                                                     
+                    type=float,default=30.0,                                                                                     
                     help="time delay between updates in [mins]")
 parser.add_argument('-p','--points',
                     type=int,default=200,                                                                       
@@ -146,6 +146,7 @@ first_pass_log = True
 logfile.write("brew_monitor.py: py.Stream was successful. About to start the streaming loop... loop for first loop pass message.\n")
 logfile.flush()
 
+
 # streaming loop
 while True:
     
@@ -157,9 +158,16 @@ while True:
            dt = 0
            
            if first_pass_log:
+               current_time = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
+               logfile.write(current_time+ ":")
                logfile.write("Streaming initiated at")
-               logfile.write("https://plot.ly/~adm78/3/lagering-chamber/")
+               logfile.write("https://plot.ly/~adm78/3/lagering-chamber/ \n") 
+               logfile.write("Uploading bm.log to dropbox as:")
+               upload_filename = "bm.running." + current_time + ".txt"
+               logfile.write(upload_filename)
                logfile.flush()
+               subprocess.call(['/home/pi/software/dropbox_uploader/dropbox_uploader.sh', 
+                                'upload', '/home/pi/bm.log', upload_filename])
                first_pass_log = False
                
        except SocketError:
