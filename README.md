@@ -12,6 +12,7 @@ In order for the monitor to work, you'll have to
 plot.ly](https://plot.ly/) to download the relevant keys and access your the live stream. 
 2. Install the MCP9808 Python library (see [here](https://learn.adafruit.com/mcp9808-temperature-sensor-python-library/software) for details)
 3. Download and set-up [Dropbox Uploader](https://github.com/andreafabrizi/Dropbox-Uploader) (optional, used for writing debug statement to a remote logfile)
+4. Edit the relevant user defined paths at the top of ```brew_monitor.py```
 
 ## Starting the monitor
 The monitor can be started using 
