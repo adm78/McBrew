@@ -1,13 +1,18 @@
-![alt tag](https://github.com/adm78/McBrew/blob/master/UI/GUIresources/mcbrew_logo_med.png)
+A series of Python scripts for recording and remotely monitoring
+fermenter temperature evolutions.
 
-A series of Python scripts for recording and remotely monitoring fermenter temperature evolutions. 
+The montior can be started using 
+```shell
+./brew_monitor.py 
+```
+which will live stream data from an MCP9808 thermal sensor to your account on [plot.ly](https://plot.ly/). 
 
-The most functional script for now is brew_monitor.py. This script is able to live stream data from an MCP9808 thermal sensor to plot.ly. 
+You'll have to set up an account with plotly to download the relevant
+keys and access your the live stream.
 
-brew_recorder.py is an alternative which uses the Dropbox API to stream data to a Dropbox account. The associated plotting script brew_reader.py is not yet fully functional. 
+```auto_start_bm.py``` is a example script that can be edited with the
+relevant file paths. Putting the full path of ```auto_start_bm.py```
+at the bottom of the file ```/etc/rc.local``` will auto-matically
+start the monitoring to run when operating system boots up.
 
-mcbrew.py is the front end GUI but, again, is not yet functional. This might be coupled with plotly at some point in the future. 
-
-i2c_tsensor_python.py is a script that reads directly from the thermal sensor. It removes the need to install the MCP9808 python library and the temperature. This would need to packaged into a library with a public getTemperature method if you want to use it.
-
-Works with Python 2.7.*. 
+Tested with Python 2.7.*. 

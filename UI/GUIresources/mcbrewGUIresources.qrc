@@ -1,7 +1,0 @@
-<RCC>
-  <qresource prefix="icons">
-    <file>ferm_square.png</file>
-    <file>ferm.png</file>
-    <file>ferm_plus_therm.png</file>
-  </qresource>
-</RCC>
