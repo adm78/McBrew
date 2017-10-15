@@ -2,12 +2,33 @@
 
 '''
 This script uploads thermal data from the brew machine to the plotly
-server. Requires a wireless connection script wireless.sh to be placed
-in the run directory to ensure the connection is mantained.
-
+server. 
 '''
-#debug
-logfile = open('/home/pi/bm.log','a')
+#==================================================================
+# User defined set-up parameters
+#==================================================================
+# local_logfile variable is used to define path to where the local
+# logfile should be created. Only progress/debug info is written to this
+# file (i.e. no thermal time-series data).
+local_logfile = '/home/pi/bm.log'
+
+# dropbox_uploader should indicate the full path to the
+# dropbox_uploader.sh used to upload to the local logfile.
+# This is an optional feature.
+# If you don't want to use this feature then set
+# dropbox_uploader = ''.
+dropbox_uploader = '/home/pi/software/dropbox_uploader/dropbox_uploader.sh'
+
+# remote_url should indicate where the trace is being streamed to.
+# This variable just affects what's written to the log files.
+remote_url = 'https://plot.ly/~adm78/0/primary-fermenter-test/'
+
+#==================================================================
+
+# ==================================================================                                                      
+# module imports                                                                                                     
+# ==================================================================
+logfile = open(local_logfile,'a')
 logfile.write("brew_monitor.py: hello world. Starting module imports...\n")
 logfile.flush()
 
@@ -22,7 +43,7 @@ from socket import error as SocketError
 import os
 import subprocess
 
-#debug
+
 logfile.write("brew_monitor.py: I've just imported all the modules.\n")
 logfile.flush()
 # ==================================================================                                                      
@@ -32,7 +53,7 @@ logfile.flush()
 parser = argparse.ArgumentParser(                                                                                        
     description=("reads data from MCP9808 temperature sensor" +
                  "via i2c and streams live to plotly server" +
-                 "at https://plot.ly/~adm78/0/primary-fermenter-test/"),                                                            
+                 remote_url),                                                            
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)                                                              
 parser.add_argument('-t','--time_delay',
                     type=float,default=30.0,                                                                                     
@@ -44,7 +65,8 @@ args = parser.parse_args()
 time_delay =  args.time_delay*60.0
 max_points = args.points
 
-logfile.write("brewing_monitor.py: I've just parse the args. About to check time delay\n")
+logfile.write("brewing_monitor.py: I've just parse the args. ")
+logfile.write("About to check time delay\n")
 
 # check that the delay is okay
 if time_delay <= 1680.0:
@@ -58,7 +80,14 @@ else:
     logfile.write("Updating every" +  str(args.time_delay) + "[mins].\n")
 logfile.flush()    
 
-logfile.write("brewing_monitor.py: I've just check the time delay. About to start the sensor connection")
+#check to see if the dropbox uploader script exists
+upload_log = False
+if dropbox_uploader != '':
+    if os.path.isfile(dropbox_uploader):
+        upload_log = True
+
+logfile.write("brewing_monitor.py: I've just check the time delay. ")
+logfile.write("About to start the sensor connection")
 logfile.flush()
 #================================================================== 
 def send_data(s,sensor):
@@ -101,7 +130,8 @@ stream_1 = go.Stream(
     maxpoints=max_points # keep a max of max_points pts on screen
 )
 
-logfile.write("brew_monitor.py: stream_1 object created. About to try an initialise the trace...\n")
+logfile.write("brew_monitor.py: stream_1 object created.")
+logfile.write("About to try an initialise the trace...\n")
 logfile.flush()
 
 # Initialize trace of streaming plot by embedding the unique stream_id
@@ -119,7 +149,8 @@ layout = go.Layout(title='Lagering Chamber',
                    xaxis=dict(title="Time"),
                    yaxis=dict(title="Temperature/degC"))
 
-logfile.write("brew_monitor.py: go.Data completed. about to make the fig and run py.plot...\n")
+logfile.write("brew_monitor.py: go.Data completed.")
+logfile.write("about to make the fig and run py.plot...\n")
 logfile.flush()
 
 # Make a figure object
@@ -129,7 +160,8 @@ fig = go.Figure(data=data, layout=layout)
 py.plot(fig, filename='Oktoberfest_stream',auto_open=False)
 
 
-logfile.write("brew_monitor.py: run py.plot successfully. About to try py.Stream before we start the loop...\n")
+logfile.write("brew_monitor.py: run py.plot successfully.")
+logfile.write("About to try py.Stream before we start the loop...\n")
 logfile.flush()
 
 #start of continuous streaming section
@@ -143,7 +175,8 @@ s = py.Stream(stream_id)
 dt = time_delay
 first_pass_log = True
 
-logfile.write("brew_monitor.py: py.Stream was successful. About to start the streaming loop... loop for first loop pass message.\n")
+logfile.write("brew_monitor.py: py.Stream was successful. ")
+logfile.write("About to start the streaming loop....\n")
 logfile.flush()
 
 
@@ -161,18 +194,19 @@ while True:
                current_time = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))
                logfile.write(current_time+ ":")
                logfile.write("Streaming initiated at")
-               logfile.write("https://plot.ly/~adm78/3/lagering-chamber/ \n") 
+               logfile.write(remote_url + " \n") 
                logfile.write("Uploading bm.log to dropbox as:")
                upload_filename = "bm.running." + current_time + ".txt"
                logfile.write(upload_filename)
                logfile.flush()
-               subprocess.call(['/home/pi/software/dropbox_uploader/dropbox_uploader.sh', 
-                                'upload', '/home/pi/bm.log', upload_filename])
+               if upload_log:
+                   subprocess.call([dropbox_uploader, 
+                                    'upload', local_logfile, upload_filename])
                first_pass_log = False
                
        except SocketError:
            logfile.write(str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'))+ ":")
-           logfile.write("No connection to perform data stream.")
+           logfile.write("No connection to perform data stream. ")
            logfile.write("Attempting to reconnect to wireless...\n")
            logfile.flush()
            os.system('./wireless_connect.sh')
