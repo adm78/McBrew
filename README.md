@@ -1,5 +1,4 @@
- 
-![McBrew](https://user-images.githubusercontent.com/17439476/31589234-27770c64-b1f6-11e7-95a9-909d33a73afa.png)
+# McBrew 
 
 A series of Python scripts for recording and remotely
 monitoring temperatures (from your browser) using an
