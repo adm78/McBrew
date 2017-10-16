@@ -1,3 +1,5 @@
+<a><img src="https://user-images.githubusercontent.com/17439476/31613823-3638b88e-b27c-11e7-9b7d-7b078defd17c.png"
+ alt="McBrew Logo" title="McBrew" align="left" /></a>
 # McBrew 
 
 A series of Python scripts for recording and remotely
