@@ -25,7 +25,7 @@ which will live stream data from a MCP9808 thermal sensor to your account on [pl
 
 
 ## Additional stuff
-```auto_start_bm.py``` is an example script to auto start the monitor when you machine is switched on. To use it, you'll need edit the relevant paths to point to the McBrew directory. Putting the full path of ```auto_start_bm.py```
+```auto_start_bm.py``` is an example script to auto start the monitor when you machine is switched on. To use it, you'll need to edit the relevant paths to point to the McBrew directory. Putting the full path of ```auto_start_bm.py```
 at the bottom of the file ```/etc/rc.local``` will automatically
 start the monitoring when your machine is booted.
 
